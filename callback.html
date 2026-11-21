@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>Sign-in done · Jarvis Clips</title>
+<style>
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 32px 16px; color: #1b1f24; background: #fff; }
+  textarea { width: 100%; box-sizing: border-box; min-height: 120px; font: 14px/1.4 ui-monospace, monospace; }
+  button { font: inherit; padding: 10px 16px; margin-top: 12px; min-height: 44px; cursor: pointer; }
+  @media (prefers-color-scheme: dark) { body { color: #e6edf3; background: #0d1117; } textarea { background: #161b22; color: #e6edf3; } }
+</style>
+</head>
+<body>
+<h1 id="title">Sign-in done</h1>
+<p id="what">Copy this address and paste it into Jarvis (Personal → Posting, next to the account). Nothing is sent from this page; the code works once and expires in minutes.</p>
+<label for="addr">Address to paste</label>
+<textarea id="addr" readonly></textarea>
+<button type="button" id="copy">Copy address</button>
+<script>
+  // Shows this page's own address (with ?code=&state=) so it can be pasted
+  // into Jarvis on the PC. No requests, no storage, no third-party scripts.
+  var addr = document.getElementById('addr');
+  addr.value = location.href;
+  var p = new URLSearchParams(location.search);
+  if (p.get('error')) {
+    document.getElementById('title').textContent = 'Sign-in was cancelled';
+    document.getElementById('what').textContent = 'The platform said: ' + (p.get('error_description') || p.get('error')) + '. Go back to Jarvis and press Connect again.';
+  }
+  document.getElementById('copy').onclick = function () {
+    addr.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(addr.value) : Promise.reject()).then(
+      function () { document.getElementById('copy').textContent = 'Copied'; },
+      function () { document.execCommand('copy'); document.getElementById('copy').textContent = 'Copied'; }
+    );
+  };
+</script>
+</body>
+</html>
